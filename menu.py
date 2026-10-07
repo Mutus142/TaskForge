@@ -18,22 +18,23 @@ while True:
 
     except ValueError:
         print("\n [!] Opção inválida. Digite um número.")
+        continue
 
-        if opcao == 1:
-            ver_task()
+    if opcao == 1:
+        ver_task()
 
-        elif opcao == 2:
-            add_task()
+    elif opcao == 2:
+        add_task()
 
-        elif opcao == 3:
-            remove_task()
+    elif opcao == 3:
+        remove_task()
 
-        elif opcao == 4:
-            concluir_task()
+    elif opcao == 4:
+        concluir_task()
 
-        elif opcao == 0:
-            print('Saindo...')
-            break
+    elif opcao == 0:
+        print("\n [>] Encerrando TaskForge...")
+        break
 
-        else:
-            print('Opção invalida!')
+    else:
+        print("\n [!] Opção inválida!")
