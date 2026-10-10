@@ -19,3 +19,17 @@ def ver_task():
             registro = cursor.fetchall()
 
     print(registro)
+
+def adicionar_task():
+
+    print('Adicione uma Tarefa! Prencha todas as especificaçĩes:')
+    titulo = input('Qual é o titulo?')
+    prioridade = input('Qual é a prioridade?')
+    situacao = False
+
+    with conectar_banco() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute("INSERT INTO tarefas (titulo, prioridade, concluida) VALUES (%s, %s, %s)", (titulo, prioridade, situacao))
+            registro = cursor.fetchall()
+
+    print("Tarefa adicionada com sucesso!")
