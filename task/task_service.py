@@ -11,18 +11,34 @@ class Tarefa:
         self.prioridade = prioridade
         self.concluida = concluida
 
+
 def ver_task():
 
     with conectar_banco() as conexao:
         with conexao.cursor() as cursor:
-            cursor.execute("select * from tarefas")
+            cursor.execute("SELECT * FROM tarefas ORDER BY id")
             registro = cursor.fetchall()
 
     print("\n========== TASKFORGE ==========")
     print("         SUAS TAREFAS")
     print("===============================")
-    print(registro)
+
+    if not registro:
+        print("\nNenhuma tarefa cadastrada.")
+    else:
+        for tarefa in registro:
+            id, titulo, prioridade, concluida = tarefa
+
+            situacao = "Concluída" if concluida else "Pendente"
+
+            print(f"\nID:         {id}")
+            print(f"Título:     {titulo}")
+            print(f"Prioridade: {prioridade}")
+            print(f"Situação:   {situacao}")
+            print("-------------------------------")
+
     print("===============================\n")
+
 
 def adicionar_task():
 
@@ -30,17 +46,21 @@ def adicionar_task():
     print("       ADICIONAR TAREFA")
     print("===============================")
 
-    titulo = input('Qual é o titulo? ')
-    prioridade = input('Qual é a prioridade? ')
+    titulo = input("Qual é o título? ")
+    prioridade = input("Qual é a prioridade? ")
     situacao = False
 
     with conectar_banco() as conexao:
         with conexao.cursor() as cursor:
-            cursor.execute("INSERT INTO tarefas (titulo, prioridade, concluida) VALUES (%s, %s, %s)", (titulo, prioridade, situacao))
-            registro = cursor.fetchall()
+            cursor.execute(
+                "INSERT INTO tarefas (titulo, prioridade, concluida) VALUES (%s, %s, %s)",
+                (titulo, prioridade, situacao)
+            )
 
-    print("\n===============================")
+    print("\n-------------------------------")
     print("  Tarefa adicionada com sucesso!")
+    print(f"  Título: {titulo}")
+    print(f"  Prioridade: {prioridade}")
     print("===============================\n")
 
 

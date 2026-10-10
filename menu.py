@@ -8,7 +8,7 @@ while True:
     print("""
 ========================================
               TASKFORGE
-               v0.1
+               v1.0
 ========================================
  [1] Ver tarefas
  [2] Adicionar tarefa
