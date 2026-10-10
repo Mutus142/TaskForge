@@ -1,3 +1,8 @@
+from task.task_service import ver_task
+from task.task_service import adicionar_task
+from task.task_service import remove_task
+from task.task_service import concluir_task
+
 while True:
 
     print("""
@@ -24,7 +29,7 @@ while True:
         ver_task()
 
     elif opcao == 2:
-        add_task()
+        adicionar_task()
 
     elif opcao == 3:
         remove_task()
