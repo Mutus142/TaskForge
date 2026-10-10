@@ -30,8 +30,8 @@ def adicionar_task():
     print("       ADICIONAR TAREFA")
     print("===============================")
 
-    titulo = input('Qual é o titulo?')
-    prioridade = input('Qual é a prioridade?')
+    titulo = input('Qual é o titulo? ')
+    prioridade = input('Qual é a prioridade? ')
     situacao = False
 
     with conectar_banco() as conexao:
@@ -76,4 +76,39 @@ def remove_task():
                 print("  Tarefa não encontrada!")
                 print("===============================\n")
 
-        
+
+
+def concluir_task():
+
+    print("\n========== TASKFORGE ==========")
+    print("         CONCLUIR TAREFA")
+    print("===============================")
+
+    titulo = input('Qual é a tarefa que deseja concluir? ').strip()
+
+    with conectar_banco() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                "SELECT TITULO FROM TAREFAS WHERE TITULO = %s",
+                (titulo,)
+            )
+
+            registro = cursor.fetchone()
+
+            if registro is not None:
+                cursor.execute(
+                    "UPDATE TAREFAS SET CONCLUIDA = TRUE WHERE TITULO = %s",
+                    (titulo,)
+                )
+
+                print("\n-------------------------------")
+                print("  Tarefa concluída com sucesso!")
+                print(f"  Título: {titulo}")
+                print("===============================\n")
+
+            else:
+                print("\n-------------------------------")
+                print("  Tarefa não encontrada!")
+                print("===============================\n")
+
+            
