@@ -3,6 +3,7 @@ from task.task_service import adicionar_task
 from task.task_service import remove_task
 from task.task_service import concluir_task
 from task.editar import editar_task
+
 while True:
 
     print("""

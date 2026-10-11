@@ -121,3 +121,73 @@ def editar_titulo(task):
                     print("\n[ERRO] Opção inválida!")
 
 def editar_prioridade(task):
+
+    with conectar_banco() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                "select * from tarefas where titulo = %s", (task,)
+            )
+            resultado = cursor.fetchone()
+
+            if resultado is not None:
+
+                prioridades = ["Alta", "Moderada", "Baixa"]
+
+                print("""
+========================================
+          TASKFORGE v1.1
+========================================
+         EDITAR PRIORIDADE
+========================================
+         PRIORIDADES DISPONÍVEIS
+----------------------------------------
+ [1] Alta
+ [2] Moderada
+ [3] Baixa
+========================================
+                """)
+
+                prioridade = input("Digite a nova prioridade: ").strip().capitalize()
+
+                if prioridade in prioridades:
+
+                    with conectar_banco() as conexao:
+                        with conexao.cursor() as cursor:
+                            cursor.execute(
+                                "UPDATE tarefas SET prioridade = %s WHERE titulo = %s",
+                                (prioridade, task)
+                            )
+
+                    print(f"""
+========================================
+      PRIORIDADE ATUALIZADA!
+========================================
+ Tarefa:          {task}
+ Nova prioridade: {prioridade}
+========================================
+                    """)
+
+                else:
+                    print("""
+========================================
+         PRIORIDADE INVÁLIDA!
+========================================
+ Escolha uma das opções disponíveis:
+
+ - Alta
+ - Moderada
+ - Baixa
+========================================
+                    """)
+
+            else:
+                print("""
+========================================
+        TAREFA NÃO ENCONTRADA!
+========================================
+ Não foi possível localizar a tarefa.
+========================================
+                """)
+
+
+
