@@ -2,7 +2,7 @@ from task.task_service import ver_task
 from task.task_service import adicionar_task
 from task.task_service import remove_task
 from task.task_service import concluir_task
-
+from task.editar import editar_task
 while True:
 
     print("""
@@ -13,7 +13,8 @@ while True:
  [1] Ver tarefas
  [2] Adicionar tarefa
  [3] Remover tarefa
- [4] Concluir tarefa
+ [4] Editar tarefa
+ [5] Concluir tarefa
  [0] Sair
 ----------------------------------------
 """)
@@ -35,6 +36,9 @@ while True:
         remove_task()
 
     elif opcao == 4:
+        editar_task()
+
+    elif opcao == 5:
         concluir_task()
 
     elif opcao == 0:
