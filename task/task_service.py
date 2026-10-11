@@ -1,6 +1,9 @@
+
 import os
 import psycopg
+from datetime import datetime, date
 from database.connection import conectar_banco
+
 
 class Tarefa:
 
@@ -19,26 +22,38 @@ def ver_task():
             cursor.execute("SELECT * FROM tarefas ORDER BY id")
             registro = cursor.fetchall()
 
-    print("\n========== TASKFORGE ==========")
-    print("         SUAS TAREFAS")
-    print("===============================")
+    print("""
+========================================
+          TASKFORGE v1.5
+========================================
+             SUAS TAREFAS
+========================================
+    """)
 
     if not registro:
-        print("\nNenhuma tarefa cadastrada.")
+        print("""
+----------------------------------------
+       NENHUMA TAREFA CADASTRADA
+----------------------------------------
+    """)
+
     else:
         for tarefa in registro:
-            id, titulo, prioridade, concluida = tarefa
+            id, titulo, prioridade, concluida, vencimento = tarefa
 
             situacao = "Concluída" if concluida else "Pendente"
 
-            print(f"\nID:         {id}")
-            print(f"Título:     {titulo}")
-            print(f"Prioridade: {prioridade}")
-            print(f"Situação:   {situacao}")
-            print("-------------------------------")
+            print(f"""
+----------------------------------------
+ ID:         {id}
+ Título:     {titulo}
+ Prioridade: {prioridade}
+ Vencimento: {vencimento}
+ Situação:   {situacao}
+----------------------------------------
+            """)
 
-    print("===============================\n")
-
+    print("========================================\n")
 
 
 def adicionar_task():
@@ -47,9 +62,9 @@ def adicionar_task():
 
     print("""
 ========================================
-          TASKFORGE v1.1
+          TASKFORGE v1.5
 ========================================
-          ADICIONAR TAREFA
+           ADICIONAR TAREFA
 ========================================
     """)
 
@@ -57,7 +72,7 @@ def adicionar_task():
 
     print("""
 ----------------------------------------
-         PRIORIDADES DISPONÍVEIS
+        PRIORIDADES DISPONÍVEIS
 ----------------------------------------
  [1] Alta
  [2] Moderada
@@ -71,27 +86,69 @@ def adicionar_task():
 
         situacao = False
 
+        data = input("\nData de vencimento (DD/MM/AAAA): ")
+
+        data_convertida = datetime.strptime(data, "%d/%m/%Y").date()
+
+        if data_convertida < date.today():
+
+            print(f"""
+========================================
+             DATA JÁ VENCIDA!
+========================================
+ Data informada: {data_convertida.strftime('%d/%m/%Y')}
+
+ [AVISO] Esta data já passou!
+========================================
+            """)
+
+        elif data_convertida == date.today():
+
+            print(f"""
+========================================
+              VENCE HOJE!
+========================================
+ Vencimento: {data_convertida.strftime('%d/%m/%Y')}
+
+ [AVISO] O prazo da tarefa é hoje!
+========================================
+            """)
+
+        else:
+
+            print(f"""
+========================================
+          VENCIMENTO DEFINIDO!
+========================================
+ Vencimento: {data_convertida.strftime('%d/%m/%Y')}
+
+ [OK] A tarefa está dentro do prazo!
+========================================
+            """)
+
         with conectar_banco() as conexao:
             with conexao.cursor() as cursor:
                 cursor.execute(
-                    "INSERT INTO tarefas (titulo, prioridade, concluida) VALUES (%s, %s, %s)",
-                    (titulo, prioridade, situacao)
+                    "INSERT INTO tarefas (titulo, prioridade, concluida, vencimento) VALUES (%s, %s, %s, %s)",
+                    (titulo, prioridade, situacao, data_convertida)
                 )
 
         print(f"""
 ========================================
-       TAREFA ADICIONADA!
+           TAREFA ADICIONADA!
 ========================================
  Título:     {titulo}
  Prioridade: {prioridade}
+ Vencimento: {data_convertida}
  Situação:   Pendente
 ========================================
         """)
 
     else:
+
         print("""
 ========================================
-          PRIORIDADE INVÁLIDA!
+           PRIORIDADE INVÁLIDA!
 ========================================
  Utilize uma das opções disponíveis:
 
@@ -104,11 +161,15 @@ def adicionar_task():
 
 def remove_task():
 
-    print("\n========== TASKFORGE ==========")
-    print("         REMOVER TAREFA")
-    print("===============================")
+    print("""
+========================================
+          TASKFORGE v1.5
+========================================
+            REMOVER TAREFA
+========================================
+    """)
 
-    titulo = input("\nTítulo da tarefa: ").strip()
+    titulo = input("Título da tarefa: ").strip()
 
     with conectar_banco() as conexao:
         with conexao.cursor() as cursor:
@@ -116,33 +177,48 @@ def remove_task():
                 "SELECT TITULO FROM TAREFAS WHERE TITULO = %s",
                 (titulo,)
             )
+
             registro = cursor.fetchone()
 
             if registro is not None:
+
                 cursor.execute(
                     "DELETE FROM TAREFAS WHERE TITULO = %s",
                     (titulo,)
                 )
 
-                print("\n-------------------------------")
-                print("  Tarefa removida com sucesso!")
-                print(f"  Título: {titulo}")
-                print("===============================\n")
+                print(f"""
+========================================
+          TAREFA REMOVIDA!
+========================================
+ Título: {titulo}
+
+ [OK] Tarefa removida com sucesso!
+========================================
+                """)
 
             else:
-                print("\n-------------------------------")
-                print("  Tarefa não encontrada!")
-                print("===============================\n")
 
+                print("""
+========================================
+         TAREFA NÃO ENCONTRADA!
+========================================
+ Não foi possível localizar a tarefa.
+========================================
+                """)
 
 
 def concluir_task():
 
-    print("\n========== TASKFORGE ==========")
-    print("         CONCLUIR TAREFA")
-    print("===============================")
+    print("""
+========================================
+          TASKFORGE v1.5
+========================================
+           CONCLUIR TAREFA
+========================================
+    """)
 
-    titulo = input('Qual é a tarefa que deseja concluir? ').strip()
+    titulo = input("Qual tarefa deseja concluir? ").strip()
 
     with conectar_banco() as conexao:
         with conexao.cursor() as cursor:
@@ -154,19 +230,29 @@ def concluir_task():
             registro = cursor.fetchone()
 
             if registro is not None:
+
                 cursor.execute(
                     "UPDATE TAREFAS SET CONCLUIDA = TRUE WHERE TITULO = %s",
                     (titulo,)
                 )
 
-                print("\n-------------------------------")
-                print("  Tarefa concluída com sucesso!")
-                print(f"  Título: {titulo}")
-                print("===============================\n")
+                print(f"""
+========================================
+           TAREFA CONCLUÍDA!
+========================================
+ Título:   {titulo}
+ Situação: Concluída
+
+ [OK] Tarefa finalizada com sucesso!
+========================================
+                """)
 
             else:
-                print("\n-------------------------------")
-                print("  Tarefa não encontrada!")
-                print("===============================\n")
 
-            
+                print("""
+========================================
+         TAREFA NÃO ENCONTRADA!
+========================================
+ Não foi possível localizar a tarefa.
+========================================
+                """)
