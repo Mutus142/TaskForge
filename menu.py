@@ -3,14 +3,14 @@ from task.task_service import adicionar_task
 from task.task_service import remove_task
 from task.task_service import concluir_task
 from task.editar import editar_task
-from task.estaitstica import estatisticas
+from task.estatistica import estatisticas
 
 while True:
 
     print("""
 ========================================
               TASKFORGE
-               v1.0
+               v1.5
 ========================================
  [1] Ver tarefas
  [2] Adicionar tarefa
