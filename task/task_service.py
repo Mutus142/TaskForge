@@ -40,28 +40,66 @@ def ver_task():
     print("===============================\n")
 
 
+
 def adicionar_task():
 
-    print("\n========== TASKFORGE ==========")
-    print("       ADICIONAR TAREFA")
-    print("===============================")
+    prioridades = ["Alta", "Moderada", "Baixa"]
 
-    titulo = input("Qual é o título? ")
-    prioridade = input("Qual é a prioridade? ")
-    situacao = False
+    print("""
+========================================
+          TASKFORGE v1.1
+========================================
+          ADICIONAR TAREFA
+========================================
+    """)
 
-    with conectar_banco() as conexao:
-        with conexao.cursor() as cursor:
-            cursor.execute(
-                "INSERT INTO tarefas (titulo, prioridade, concluida) VALUES (%s, %s, %s)",
-                (titulo, prioridade, situacao)
-            )
+    titulo = input("Título da tarefa: ").strip()
 
-    print("\n-------------------------------")
-    print("  Tarefa adicionada com sucesso!")
-    print(f"  Título: {titulo}")
-    print(f"  Prioridade: {prioridade}")
-    print("===============================\n")
+    print("""
+----------------------------------------
+         PRIORIDADES DISPONÍVEIS
+----------------------------------------
+ [1] Alta
+ [2] Moderada
+ [3] Baixa
+----------------------------------------
+    """)
+
+    prioridade = input("Digite a prioridade: ").strip().capitalize()
+
+    if prioridade in prioridades:
+
+        situacao = False
+
+        with conectar_banco() as conexao:
+            with conexao.cursor() as cursor:
+                cursor.execute(
+                    "INSERT INTO tarefas (titulo, prioridade, concluida) VALUES (%s, %s, %s)",
+                    (titulo, prioridade, situacao)
+                )
+
+        print(f"""
+========================================
+       TAREFA ADICIONADA!
+========================================
+ Título:     {titulo}
+ Prioridade: {prioridade}
+ Situação:   Pendente
+========================================
+        """)
+
+    else:
+        print("""
+========================================
+          PRIORIDADE INVÁLIDA!
+========================================
+ Utilize uma das opções disponíveis:
+
+ - Alta
+ - Moderada
+ - Baixa
+========================================
+        """)
 
 
 def remove_task():

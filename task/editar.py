@@ -39,7 +39,7 @@ def editar_task():
                     editar_titulo(task)
 
                 elif escolha == 2:
-                    editar_prioridade()
+                    editar_prioridade(task)
 
                 else:
                     print("\n[ERRO] Opção inválida!")
@@ -119,3 +119,5 @@ def editar_titulo(task):
 
                 else:
                     print("\n[ERRO] Opção inválida!")
+
+def editar_prioridade(task):
