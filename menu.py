@@ -3,6 +3,7 @@ from task.task_service import adicionar_task
 from task.task_service import remove_task
 from task.task_service import concluir_task
 from task.editar import editar_task
+from task.estaitstica import estatisticas
 
 while True:
 
@@ -16,6 +17,7 @@ while True:
  [3] Remover tarefa
  [4] Editar tarefa
  [5] Concluir tarefa
+ [6] Estatísticas
  [0] Sair
 ----------------------------------------
 """)
@@ -41,6 +43,9 @@ while True:
 
     elif opcao == 5:
         concluir_task()
+
+    elif opcao == 6:
+        estatisticas()
 
     elif opcao == 0:
         print("\n [>] Encerrando TaskForge...")
