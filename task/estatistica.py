@@ -227,5 +227,51 @@ def est_geral():
 ========================================
     """)
 
+
 def task_atr():
-    print()
+
+    with conectar_banco() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT COUNT(*)
+                FROM tarefas
+                WHERE vencimento < CURRENT_DATE
+                AND concluida = FALSE
+                """
+            )
+
+            resultado = cursor.fetchone()
+
+            if resultado[0] > 0:
+
+                print(f"""
+========================================
+          TASKFORGE v1.5
+========================================
+           TAREFAS ATRASADAS
+========================================
+
+ Total de tarefas atrasadas: {resultado[0]}
+
+ [AVISO] Existem tarefas fora do prazo!
+
+========================================
+                """)
+
+            else:
+
+                print("""
+========================================
+          TASKFORGE v1.5
+========================================
+           TAREFAS ATRASADAS
+========================================
+
+ Total de tarefas atrasadas: 0
+
+ [OK] Nenhuma tarefa atrasada!
+
+========================================
+                """)
+
