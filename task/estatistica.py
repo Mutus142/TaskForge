@@ -16,7 +16,8 @@ def estatisticas():
  [2] Tarefas concluídas
  [3] Tarefas pendentes
  [4] Estatísticas gerais
- [5] Voltar ao menu principal
+ [5] Tarefas atrasadas
+ [6] Voltar ao menu principal
 
 ========================================
     """)
@@ -29,7 +30,7 @@ def estatisticas():
 ========================================
            OPÇÃO INVÁLIDA!
 ========================================
- Digite um número de 1 a 5.
+ Digite um número de 1 a 6.
 ========================================
         """)
         return
@@ -47,6 +48,9 @@ def estatisticas():
         est_geral()
 
     elif opcao == 5:
+        task_atr()
+
+    elif opcao == 6:
         print("\n[INFO] Voltando ao menu principal...")
         return
 
@@ -55,7 +59,7 @@ def estatisticas():
 ========================================
            OPÇÃO INVÁLIDA!
 ========================================
- Escolha uma opção entre 1 e 5.
+ Escolha uma opção entre 1 e 6.
 ========================================
         """)
 
@@ -222,3 +226,6 @@ def est_geral():
 
 ========================================
     """)
+
+def task_atr():
+    print()
