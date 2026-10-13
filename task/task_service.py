@@ -1,25 +1,33 @@
 
-import os
-import psycopg
 from datetime import datetime, date
 from database.connection import conectar_banco
 
 
 class Tarefa:
 
-    def __init__(self, id, titulo, prioridade, concluida):
+    def __init__(self, id, titulo, prioridade, concluida, vencimento, usuario_id):
 
         self.id = id
         self.titulo = titulo
         self.prioridade = prioridade
         self.concluida = concluida
+        self.vencimento = vencimento
+        self.usuario_id = usuario_id
 
 
-def ver_task():
+def ver_task(usuario_id):
 
     with conectar_banco() as conexao:
         with conexao.cursor() as cursor:
-            cursor.execute("SELECT * FROM tarefas ORDER BY id")
+            cursor.execute(
+                """
+                SELECT id, titulo, prioridade, concluida, vencimento
+                FROM tarefas
+                WHERE usuario_id = %s
+                ORDER BY id
+                """,
+                (usuario_id,)
+            )
             registro = cursor.fetchall()
 
     print("""
@@ -35,7 +43,7 @@ def ver_task():
 ----------------------------------------
        NENHUMA TAREFA CADASTRADA
 ----------------------------------------
-    """)
+        """)
 
     else:
         for tarefa in registro:
@@ -43,12 +51,17 @@ def ver_task():
 
             situacao = "Concluída" if concluida else "Pendente"
 
+            if vencimento is not None:
+                data_formatada = vencimento.strftime("%d/%m/%Y")
+            else:
+                data_formatada = "Sem prazo"
+
             print(f"""
 ----------------------------------------
  ID:         {id}
  Título:     {titulo}
  Prioridade: {prioridade}
- Vencimento: {vencimento}
+ Vencimento: {data_formatada}
  Situação:   {situacao}
 ----------------------------------------
             """)
@@ -56,7 +69,7 @@ def ver_task():
     print("========================================\n")
 
 
-def adicionar_task():
+def adicionar_task(usuario_id):
 
     prioridades = ["Alta", "Moderada", "Baixa"]
 
@@ -70,13 +83,17 @@ def adicionar_task():
 
     titulo = input("Título da tarefa: ").strip()
 
+    if not titulo:
+        print("\n[ERRO] O título não pode estar vazio!")
+        return
+
     print("""
 ----------------------------------------
         PRIORIDADES DISPONÍVEIS
 ----------------------------------------
- [1] Alta
- [2] Moderada
- [3] Baixa
+ - Alta
+ - Moderada
+ - Baixa
 ----------------------------------------
     """)
 
@@ -88,7 +105,20 @@ def adicionar_task():
 
         data = input("\nData de vencimento (DD/MM/AAAA): ")
 
-        data_convertida = datetime.strptime(data, "%d/%m/%Y").date()
+        try:
+            data_convertida = datetime.strptime(
+                data, "%d/%m/%Y"
+            ).date()
+
+        except ValueError:
+            print("""
+========================================
+             DATA INVÁLIDA!
+========================================
+ Utilize o formato DD/MM/AAAA.
+========================================
+            """)
+            return
 
         if data_convertida < date.today():
 
@@ -129,8 +159,12 @@ def adicionar_task():
         with conectar_banco() as conexao:
             with conexao.cursor() as cursor:
                 cursor.execute(
-                    "INSERT INTO tarefas (titulo, prioridade, concluida, vencimento) VALUES (%s, %s, %s, %s)",
-                    (titulo, prioridade, situacao, data_convertida)
+                    """
+                    INSERT INTO tarefas
+                    (titulo, prioridade, concluida, vencimento, usuario_id)
+                    VALUES (%s, %s, %s, %s, %s)
+                    """,
+                    (titulo, prioridade, situacao, data_convertida, usuario_id)
                 )
 
         print(f"""
@@ -139,8 +173,10 @@ def adicionar_task():
 ========================================
  Título:     {titulo}
  Prioridade: {prioridade}
- Vencimento: {data_convertida}
+ Vencimento: {data_convertida.strftime('%d/%m/%Y')}
  Situação:   Pendente
+
+ [OK] Tarefa vinculada à sua conta!
 ========================================
         """)
 
@@ -159,7 +195,7 @@ def adicionar_task():
         """)
 
 
-def remove_task():
+def remove_task(usuario_id):
 
     print("""
 ========================================
@@ -174,24 +210,24 @@ def remove_task():
     with conectar_banco() as conexao:
         with conexao.cursor() as cursor:
             cursor.execute(
-                "SELECT TITULO FROM TAREFAS WHERE TITULO = %s",
-                (titulo,)
+                """
+                DELETE FROM tarefas
+                WHERE titulo = %s AND usuario_id = %s
+                RETURNING id
+                """,
+                (titulo, usuario_id)
             )
 
-            registro = cursor.fetchone()
+            registros = cursor.fetchall()
 
-            if registro is not None:
-
-                cursor.execute(
-                    "DELETE FROM TAREFAS WHERE TITULO = %s",
-                    (titulo,)
-                )
+            if registros:
 
                 print(f"""
 ========================================
           TAREFA REMOVIDA!
 ========================================
  Título: {titulo}
+ Registros removidos: {len(registros)}
 
  [OK] Tarefa removida com sucesso!
 ========================================
@@ -203,12 +239,13 @@ def remove_task():
 ========================================
          TAREFA NÃO ENCONTRADA!
 ========================================
- Não foi possível localizar a tarefa.
+ Nenhuma tarefa com esse título
+ foi encontrada na sua conta.
 ========================================
                 """)
 
 
-def concluir_task():
+def concluir_task(usuario_id):
 
     print("""
 ========================================
@@ -223,18 +260,18 @@ def concluir_task():
     with conectar_banco() as conexao:
         with conexao.cursor() as cursor:
             cursor.execute(
-                "SELECT TITULO FROM TAREFAS WHERE TITULO = %s",
-                (titulo,)
+                """
+                UPDATE tarefas
+                SET concluida = TRUE
+                WHERE titulo = %s AND usuario_id = %s
+                RETURNING id
+                """,
+                (titulo, usuario_id)
             )
 
-            registro = cursor.fetchone()
+            registros = cursor.fetchall()
 
-            if registro is not None:
-
-                cursor.execute(
-                    "UPDATE TAREFAS SET CONCLUIDA = TRUE WHERE TITULO = %s",
-                    (titulo,)
-                )
+            if registros:
 
                 print(f"""
 ========================================
@@ -242,6 +279,7 @@ def concluir_task():
 ========================================
  Título:   {titulo}
  Situação: Concluída
+ Registros atualizados: {len(registros)}
 
  [OK] Tarefa finalizada com sucesso!
 ========================================
@@ -253,6 +291,7 @@ def concluir_task():
 ========================================
          TAREFA NÃO ENCONTRADA!
 ========================================
- Não foi possível localizar a tarefa.
+ Nenhuma tarefa com esse título
+ foi encontrada na sua conta.
 ========================================
                 """)

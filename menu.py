@@ -34,22 +34,22 @@ def menu_inicial(usuario_id):
             continue
 
         if opcao == 1:
-            ver_task()
+            ver_task(usuario_id)
 
         elif opcao == 2:
-            adicionar_task()
+            adicionar_task(usuario_id)
 
         elif opcao == 3:
-            remove_task()
+            remove_task(usuario_id)
 
         elif opcao == 4:
-            editar_task()
+            editar_task(usuario_id)
 
         elif opcao == 5:
-            concluir_task()
+            concluir_task(usuario_id)
 
         elif opcao == 6:
-            estatisticas()
+            estatisticas(usuario_id)
 
         elif opcao == 0:
             print("\n [>] Encerrando TaskForge...")
