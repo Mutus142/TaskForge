@@ -2,17 +2,17 @@
 
 # ⚒️ TaskForge
 
-### Gerenciador de tarefas em Python com PostgreSQL
+### Gerenciador de tarefas CLI com Python e PostgreSQL
 
 ![Python](https://img.shields.io/badge/Python-3.13-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Linux](https://img.shields.io/badge/Linux-openSUSE-73BA25?style=for-the-badge&logo=opensuse&logoColor=white)
-![Version](https://img.shields.io/badge/Version-1.1-8A2BE2?style=for-the-badge)
-![Status](https://img.shields.io/badge/v1.5-Em_Desenvolvimento-F59E0B?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-1.5-8A2BE2?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Lan%C3%A7amento_v1.5-22C55E?style=for-the-badge)
 
-**Organize tarefas, defina prioridades e acompanhe o que já foi concluído — diretamente pelo terminal.**
+**Organize tarefas, acompanhe vencimentos e consulte estatísticas — com contas individuais e armazenamento persistente.**
 
-[Sobre](#-sobre-o-projeto) • [Funcionalidades](#-funcionalidades-da-v11) • [Tecnologias](#️-tecnologias) • [Instalação](#-instalação) • [Roadmap](#-roadmap-da-v15)
+[Sobre](#-sobre-o-projeto) • [Funcionalidades](#-funcionalidades) • [Instalação](#-instalação-e-execução) • [Versões](#-histórico-de-versões) • [Limitações](#-limitações-conhecidas)
 
 </div>
 
@@ -20,193 +20,178 @@
 
 ## 📌 Sobre o projeto
 
-O **TaskForge** é uma aplicação de linha de comando (CLI) desenvolvida em **Python** com persistência de dados no **PostgreSQL**. Seu objetivo é oferecer um gerenciador de tarefas simples e, ao mesmo tempo, servir como projeto prático de aprendizado de Python, SQL e desenvolvimento modular.
+O **TaskForge** é um gerenciador de tarefas executado pelo terminal, desenvolvido em **Python** e integrado ao **PostgreSQL** por meio do Psycopg 3.
 
-A aplicação utiliza consultas SQL para criar, visualizar, editar, concluir e excluir tarefas. Os registros permanecem no banco de dados após o encerramento do programa.
+O projeto foi criado para praticar lógica de programação, organização modular, SQL, manipulação de datas e integração entre aplicações e bancos de dados relacionais.
 
-> **Versão atual: 1.1.** A versão **1.5 está em desenvolvimento** e ainda não é considerada uma versão estável ou lançada. Algumas funcionalidades apresentadas no roadmap podem já existir em código de desenvolvimento, mas ainda precisam de testes e integração.
+A **versão 1.5** expande o CRUD original com **cadastro e login de usuários, tarefas vinculadas à conta autenticada, prazos e estatísticas**. Os dados continuam armazenados após o encerramento da aplicação.
 
-## 🚀 Funcionalidades da v1.1
+> [!NOTE]
+> Projeto educacional, em evolução. A v1.5 é a versão de lançamento atual; melhorias de validação e segurança permanecem planejadas.
 
-| Operação | Descrição | SQL |
-|:--|:--|:--:|
-| 📋 **Listar tarefas** | Exibe ID, título, prioridade e situação | `SELECT` |
-| ➕ **Adicionar tarefa** | Cadastra título e prioridade | `INSERT` |
-| ✏️ **Editar título** | Altera o nome de uma tarefa existente | `UPDATE` |
-| 🎯 **Editar prioridade** | Modifica a prioridade de uma tarefa | `UPDATE` |
-| ✅ **Concluir tarefa** | Marca uma tarefa como concluída | `UPDATE` |
-| 🗑️ **Remover tarefa** | Exclui uma tarefa existente | `DELETE` |
-| 💾 **Persistência** | Armazena as alterações no PostgreSQL | — |
+## 🚀 Funcionalidades
 
-### ⚙️ Recursos da versão atual
+| Recurso | Descrição | Principais recursos técnicos |
+|:--|:--|:--|
+| 👤 **Cadastro de usuários** | Criação de contas com nome, username e senha de teste | `INSERT`, `UNIQUE` |
+| 🔑 **Login** | Identificação da conta e acesso ao menu | `SELECT`, `usuario_id` |
+| 📋 **Listagem de tarefas** | Mostra somente as tarefas da conta autenticada | `SELECT`, `WHERE` |
+| ➕ **Cadastro de tarefas** | Adiciona título, prioridade e vencimento | `INSERT`, `DATE` |
+| ✏️ **Edição** | Altera título ou prioridade | `UPDATE` |
+| ✅ **Conclusão** | Marca tarefas como concluídas | `UPDATE` |
+| 🗑️ **Exclusão** | Remove tarefas existentes | `DELETE` |
+| 📊 **Estatísticas** | Conta cadastradas, concluídas, pendentes e atrasadas | `COUNT()`, `CURRENT_DATE` |
+| 💾 **Persistência** | Armazena usuários e tarefas no PostgreSQL | Psycopg 3 |
 
-- Prioridades padronizadas: **Alta**, **Moderada** e **Baixa**.
-- Verificação da existência de tarefas antes das operações de edição.
-- Menus e mensagens formatados para uso no terminal.
-- Identificadores únicos gerados pelo PostgreSQL.
-- Consultas parametrizadas com `%s` por meio do **Psycopg 3**.
-- Configuração da senha do banco por variável de ambiente.
-- Separação da conexão, das operações e da edição em módulos Python.
+### ⚙️ Recursos adicionais
 
-> [!IMPORTANT]
-> As operações por **título** ainda podem afetar vários registros quando existem títulos iguais. A migração dessas operações para **ID** e a ampliação das validações fazem parte das melhorias planejadas. A validação de prioridades ocorre na aplicação; ainda não há indicação de uma restrição equivalente no banco.
+- Prioridades disponíveis: **Alta**, **Moderada** e **Baixa**.
+- Datas de vencimento informadas no formato **DD/MM/AAAA**.
+- Avisos para datas passadas, vencimento no dia e datas futuras.
+- Estatísticas gerais e individuais, filtradas pelo usuário autenticado.
+- Menus e mensagens padronizados no terminal.
+- Consultas SQL parametrizadas com `%s`.
+- Organização do código em módulos de usuários, tarefas e conexão.
 
----
+## 🛠️ Tecnologias utilizadas
 
-## 🛠️ Tecnologias
-
-| Tecnologia | Papel no projeto |
+| Tecnologia | Utilização |
 |:--|:--|
-| **Python 3.13** | Regras de negócio e interface de terminal |
-| **PostgreSQL 18** | Armazenamento relacional das tarefas |
-| **Psycopg 3** | Conexão e execução de SQL a partir do Python |
-| **python-dotenv** | Carregamento das variáveis de ambiente |
-| **SQL** | `SELECT`, `INSERT`, `UPDATE`, `DELETE` e consultas de contagem |
-| **openSUSE Linux** | Ambiente de desenvolvimento |
-| **Git e GitHub** | Versionamento e publicação |
-| **VS Code** | Desenvolvimento e edição do código |
-
----
+| **Python 3.13** | Lógica, interface CLI e manipulação de datas |
+| **PostgreSQL** | Banco de dados relacional |
+| **Psycopg 3** | Comunicação Python–PostgreSQL |
+| **python-dotenv** | Leitura de configurações em `.env` |
+| **datetime** | Validação e formatação de datas |
+| **SQL** | CRUD, filtros e estatísticas |
+| **Git / GitHub** | Versionamento e documentação |
+| **openSUSE / VS Code** | Ambiente de desenvolvimento |
 
 ## 📂 Estrutura do projeto
 
-Estrutura de referência dos módulos trabalhados no projeto:
-
 ```text
 TaskForge/
-├── menu.py
+├── main.py                # Entrada principal da aplicação
+├── menu.py                # Menu após autenticação
 ├── README.md
 ├── requirements.txt
 ├── .gitignore
-├── .env                  # Local: não enviar ao GitHub
+├── .env                   # Configurações locais; não versionar
 ├── database/
-│   └── connection.py
+│   └── connection.py      # Conexão com PostgreSQL
+├── user/
+│   ├── cadastro.py        # Cadastro de usuários
+│   └── login.py           # Login e fluxo de acesso
 └── task/
-    ├── task_service.py   # Cadastro, listagem, conclusão e exclusão
-    ├── editar.py         # Edição de título e prioridade (v1.1)
-    └── tarefa.py         # Representação da tarefa, se separada em módulo
+    ├── task_service.py   # Listar, adicionar, remover e concluir
+    ├── editar.py         # Editar título e prioridade
+    └── estatistica.py    # Indicadores e contagens
 ```
 
-Os nomes e a distribuição dos arquivos podem variar conforme os módulos forem reorganizados. O código de **estatísticas da v1.5** está em construção e não é apresentado como recurso lançado.
-
----
+*Estrutura dos arquivos principais trabalhados no projeto; outros arquivos auxiliares podem existir no repositório.*
 
 ## 🗄️ Banco de dados
 
-A base utiliza uma tabela `tarefas`. A estrutura fundamental da **v1.1** é:
+O relacionamento é de **um usuário para muitas tarefas (1:N)**, por meio da chave estrangeira `tarefas.usuario_id`.
+
+### Exemplo de esquema para uma instalação nova
 
 ```sql
+CREATE TABLE usuarios (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    senha_hash TEXT NOT NULL,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE tarefas (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     titulo VARCHAR(150) NOT NULL,
     prioridade VARCHAR(20) NOT NULL,
-    concluida BOOLEAN DEFAULT FALSE
+    concluida BOOLEAN DEFAULT FALSE,
+    vencimento DATE,
+    usuario_id INTEGER REFERENCES usuarios(id)
 );
 ```
 
-| Coluna | Tipo | Descrição |
-|:--|:--|:--|
-| `id` | `INTEGER` | Identificador único da tarefa |
-| `titulo` | `VARCHAR(150)` | Nome da tarefa |
-| `prioridade` | `VARCHAR(20)` | Alta, Moderada ou Baixa, validada no Python |
-| `concluida` | `BOOLEAN` | `FALSE` = pendente; `TRUE` = concluída |
-
-**Mudança em desenvolvimento para a v1.5:** adicionar uma coluna opcional de prazo:
-
-```sql
-ALTER TABLE tarefas
-ADD COLUMN vencimento DATE;
-```
-
-> [!NOTE]
-> A coluna `vencimento` já faz parte dos estudos e do desenvolvimento da v1.5, mas **não é requisito da versão 1.1**. Execute a migração somente quando quiser testar o código de desenvolvimento que utiliza vencimentos. Se a coluna já existir, não execute o comando novamente.
-
----
+> [!IMPORTANT]
+> Esse SQL é um **exemplo de criação para banco vazio**. Caso já possua a base das versões anteriores, **não recrie as tabelas**: preserve seus dados e utilize migrações como `ALTER TABLE` para adicionar as colunas necessárias. Tarefas antigas com `usuario_id = NULL` não aparecem nas consultas filtradas por conta até serem associadas a um usuário.
 
 ## 🖥️ Prévia do terminal
 
-### 📋 Listar tarefas
+### Login
 
 ```text
 ========================================
-          TASKFORGE v1.1
+          TASKFORGE v1.5
+========================================
+           SISTEMA DE LOGIN
+========================================
+
+ Digite seu usuário: mutus
+ Digite sua senha: ********
+
+========================================
+          LOGIN REALIZADO!
+========================================
+```
+
+### Menu principal
+
+```text
+========================================
+              TASKFORGE
+               v1.5
+========================================
+ [1] Ver tarefas
+ [2] Adicionar tarefa
+ [3] Remover tarefa
+ [4] Editar tarefa
+ [5] Concluir tarefa
+ [6] Estatísticas
+ [0] Sair
+----------------------------------------
+```
+
+### Tarefas
+
+```text
+========================================
+          TASKFORGE v1.5
 ========================================
              SUAS TAREFAS
 ========================================
  ID:         1
- Título:     Estudar Python
- Prioridade: Alta
- Situação:   Pendente
-----------------------------------------
- ID:         2
- Título:     Revisar SQL
- Prioridade: Moderada
- Situação:   Concluída
-========================================
-```
-
-### ➕ Adicionar tarefa
-
-```text
-========================================
-          TASKFORGE v1.1
-========================================
-           ADICIONAR TAREFA
-========================================
- Título da tarefa: Estudar PostgreSQL
-
-         PRIORIDADES DISPONÍVEIS
-----------------------------------------
- [1] Alta
- [2] Moderada
- [3] Baixa
-----------------------------------------
- Digite a prioridade: Alta
-
-========================================
-           TAREFA ADICIONADA!
-========================================
  Título:     Estudar PostgreSQL
  Prioridade: Alta
+ Vencimento: 20/10/2026
  Situação:   Pendente
-========================================
+----------------------------------------
 ```
 
-### ✏️ Editar tarefa
+### Estatísticas
 
 ```text
 ========================================
-          TASKFORGE v1.1
+          TASKFORGE v1.5
 ========================================
-             EDITAR TAREFA
+         ESTATÍSTICAS GERAIS
 ========================================
- Qual tarefa deseja editar? Estudar Python
-
- [1] Editar título
- [2] Editar prioridade
-
- Escolha uma opção: 1
- Digite o novo título: Estudar Python e SQL
-
-========================================
-           TAREFA ATUALIZADA!
-========================================
- Título anterior: Estudar Python
- Novo título:     Estudar Python e SQL
+ Tarefas cadastradas: 10
+ Tarefas concluídas:  6
+ Tarefas pendentes:   4
 ========================================
 ```
 
-*Exemplos ilustrativos da interface CLI; a saída exata pode variar entre os módulos.*
+*As telas são ilustrativas; os valores dependem dos dados de cada usuário.*
 
----
-
-## 📥 Instalação
+## 📥 Instalação e execução
 
 ### 1. Pré-requisitos
 
-- Python 3 instalado.
+- Python 3.13 (ou versão compatível).
 - PostgreSQL instalado e em execução.
-- Git para clonar o repositório.
+- Git.
 
 ### 2. Clonar o repositório
 
@@ -217,111 +202,80 @@ cd TaskForge
 
 ### 3. Criar o ambiente virtual
 
-No Linux:
-
 ```bash
 python3 -m venv .venv
-source .venv/bin/activate
 ```
 
-### 4. Instalar as dependências
+### 4. Instalar dependências
 
 ```bash
-python -m pip install "psycopg[binary]" python-dotenv
+./.venv/bin/python -m pip install -r requirements.txt
 ```
 
-Se o `requirements.txt` estiver atualizado com as dependências do projeto, também é possível usar `python -m pip install -r requirements.txt`.
+Caso o arquivo de dependências ainda não esteja atualizado, as principais bibliotecas externas utilizadas são `psycopg[binary]` e `python-dotenv`.
 
-### 5. Preparar o PostgreSQL
+### 5. Configurar o banco de dados
 
-Crie o banco de dados e execute a definição da tabela apresentada em [Banco de dados](#️-banco-de-dados). A configuração de conexão utilizada no projeto é baseada em:
+Crie o banco PostgreSQL, prepare as tabelas descritas acima e confira as configurações de conexão em `database/connection.py`.
 
-```python
-host="localhost"
-port=5432
-dbname="TaskForge"
-user="taskforge_user"
-```
-
-Crie ou configure esse usuário com as permissões adequadas. No PostgreSQL, nomes criados entre aspas preservam maiúsculas/minúsculas — isso vale para `"TaskForge"`.
-
-### 6. Configurar a senha
-
-Crie um arquivo `.env` na raiz do projeto:
+Configure a senha em um arquivo `.env` na raiz do projeto, conforme a variável esperada pelo módulo de conexão. Na configuração trabalhada durante o desenvolvimento:
 
 ```env
-TASKFORGE_DB_PASSWORD=sua_senha_aqui
+TASKFORGE_DB_PASSWORD=sua_senha_de_teste
 ```
 
 > [!CAUTION]
-> Nunca envie o `.env` com credenciais reais ao GitHub. Confirme que ele consta no `.gitignore`.
+> Nunca publique seu `.env` nem credenciais reais no GitHub. Confirme que `.env` e `.venv/` estão no `.gitignore`.
 
-### 7. Executar a aplicação
+### 6. Iniciar o TaskForge
 
-A entrada do projeto é o menu em `menu.py`:
-
-```bash
-python menu.py
-```
-
-Caso esteja testando funções isoladamente, uma operação também pode ser executada pelo módulo correspondente, por exemplo:
+No Linux, a partir da raiz do projeto:
 
 ```bash
-python -c "from task.task_service import ver_task; ver_task()"
+./.venv/bin/python main.py
 ```
 
-> [!NOTE]
-> A execução depende de a configuração do PostgreSQL estar correta e de o menu importar as funções dos módulos existentes. Os exemplos representam a organização desenvolvida até aqui.
-
----
+O sistema inicia pela tela de login e libera o menu de tarefas após a autenticação.
 
 ## 📝 Histórico de versões
 
-### ✅ v1.0 — Base do TaskForge
+### ✅ v1.5 — Usuários, vencimentos e estatísticas
 
-- Estrutura inicial em Python.
-- Conexão e persistência com PostgreSQL.
-- Cadastro, listagem, conclusão e remoção de tarefas.
-- Identificador automático, prioridade e situação de conclusão.
-- SQL parametrizado e configuração de credenciais fora do código.
+- Cadastro e login de usuários.
+- Tarefas vinculadas por `usuario_id`.
+- Listagem, edição, conclusão e remoção restritas à conta autenticada.
+- Datas de vencimento armazenadas no PostgreSQL.
+- Estatísticas de tarefas cadastradas, concluídas, pendentes e atrasadas.
+- Interface CLI padronizada e fluxo centralizado em `main.py`.
 
-### ✅ v1.1 — Edição e melhorias de usabilidade **(versão atual)**
+### ✅ v1.1 — Edição e validações
 
-- Criação do módulo `task/editar.py`.
-- Edição de títulos de tarefas.
-- Edição de prioridades.
-- Opções de prioridade limitadas a **Alta**, **Moderada** e **Baixa** no fluxo de cadastro e edição.
-- Verificações de existência de tarefas durante a edição.
-- Revisão e padronização visual dos menus e mensagens.
-- Melhor organização das operações em funções e módulos.
+- Edição de título e prioridade.
+- Padronização de prioridades (Alta, Moderada e Baixa).
+- Melhorias de organização dos arquivos e mensagens do terminal.
 
-### 🚧 v1.5 — Productivity Update **(em desenvolvimento)**
+### ✅ v1.0 — Base do projeto
 
-- Inclusão de data de vencimento nas tarefas.
-- Conversão e comparação de datas com `datetime`.
-- Consulta de quantidades de tarefas cadastradas, concluídas e pendentes.
-- Menu específico de estatísticas e resumo geral.
-- Evolução da listagem para considerar prazos.
+- Conexão Python + PostgreSQL.
+- Operações CRUD e persistência.
+- Consultas SQL parametrizadas.
+- Organização inicial da aplicação.
 
-*Esses recursos estão sendo implementados e revisados; não representam uma versão 1.5 já publicada.*
+## ⚠️ Limitações conhecidas
 
----
+- **Senhas de teste em texto puro:** na implementação educacional atual, o campo `senha_hash` não armazena necessariamente um hash. **Não use senhas reais e não disponibilize essa autenticação para uso público.** Uma versão destinada a usuários reais precisará de hash de senhas e reforços de segurança.
+- **Operações por título:** quando um mesmo usuário tem tarefas com títulos iguais, editar, concluir ou excluir pode afetar mais de um registro. A migração para identificação por **ID** está planejada.
+- **Validações e navegação:** o projeto ainda poderá receber melhorias no tratamento de exceções, tentativas repetidas de login e logout.
+- **Tarefas legadas:** registros anteriores à implementação das contas podem precisar de associação manual ao usuário correto.
 
-## 🔮 Roadmap da v1.5
+## 🔮 Próximas melhorias
 
-- [x] Iniciar cadastro de vencimentos com `datetime` e PostgreSQL.
-- [x] Desenvolver as primeiras consultas de estatísticas (`COUNT`).
-- [x] Criar a estrutura inicial do menu de estatísticas.
-- [ ] Validar datas inválidas e títulos vazios de forma consistente.
-- [ ] Identificar automaticamente tarefas atrasadas, com vencimento hoje ou dentro do prazo.
-- [ ] Adicionar filtros de listagem por situação, prioridade e vencimento.
-- [ ] Implementar taxa de conclusão das tarefas.
-- [ ] Migrar operações sensíveis ao título para identificação por ID.
-- [ ] Consolidar e testar a integração entre menu, edição, vencimentos e estatísticas.
-- [ ] Escrever testes automatizados e revisar mensagens de erro.
-- [ ] Publicar e marcar a versão **v1.5** após a validação final.
-
-**Ideias para a v2.0:** API REST com FastAPI e, futuramente, uma interface web.
+- [ ] Atualizar operações de edição, conclusão e remoção para usar ID.
+- [ ] Substituir tentativas recursivas de login por um fluxo iterativo.
+- [ ] Implementar logout explícito e retorno à tela inicial.
+- [ ] Ampliar os testes automatizados e o tratamento de erros.
+- [ ] Melhorar a autenticação antes de qualquer uso fora de um ambiente de estudo.
+- [ ] Adicionar filtros avançados por prioridade e vencimento.
 
 ---
 
@@ -329,12 +283,12 @@ python -c "from task.task_service import ver_task; ver_task()"
 
 <div align="center">
 
-### Mateus — [Mutus142](https://github.com/Mutus142)
+### Mateus — Mutus142
 
-Projeto criado para aprofundar conhecimentos em **Python, SQL, PostgreSQL e desenvolvimento de aplicações com banco de dados**.
+Projeto desenvolvido para aprofundar conhecimentos em **Python, SQL, PostgreSQL e desenvolvimento de software**.
 
 [![GitHub](https://img.shields.io/badge/GitHub-Mutus142-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Mutus142)
 
-**⭐ Se o projeto foi útil ou interessante, considere deixar uma estrela no repositório!**
+**⭐ Se gostou do projeto, considere deixar uma estrela no repositório!**
 
 </div>
