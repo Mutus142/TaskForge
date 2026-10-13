@@ -1,77 +1,144 @@
 
+from user.cadastro import cad_user
 from database.connection import conectar_banco
+from menu import menu_inicial
 import time
 
+
 def tela_login():
-    print('''
-    Bem vindo ao TaskForge 1.5
 
-    Faça seu login abaixo ou cadastre seu usuario!
+    print("""
+========================================
+          TASKFORGE v1.5
+========================================
+           SISTEMA DE LOGIN
+========================================
 
-    ''')
+ Bem-vindo ao TaskForge!
 
-    def login():
+ Faça seu login ou cadastre um usuário.
 
-        try:
-            nome_user = input("Digite o seu usuario: ")
-        except ValueError:
-            print("Valor invalido!")
-            return
+========================================
+    """)
 
-        with conectar_banco() as conexao:
-            with conexao.cursor() as cursor:
-                cursor.execute(
-                    "select username from usuarios where username = %s", (nome_user,)
-                )
-                resultado = cursor.fetchone()
+    return login()
 
-                if resultado is not None:
-                    print("Usuário validado!")
 
-                    try:
-                        senha_user = input("Digite a sua senha: ")
-                    except ValueError:
-                        print("Valor invalido!")
-                        return
+def login():
 
-                    with conectar_banco() as conexao:
-                        with conexao.cursor() as cursor:
-                            cursor.execute(
-                                "select senha_hash from usuarios where senha_hash = %s and username = %s", (senha_user, nome_user)
-                            )
-                            resultado_senha = cursor.fetchone()
+    try:
+        nome_user = input("\nDigite seu usuário: ").strip()
 
-                            if resultado_senha is not None:
-                                print("Senha invalida!")
-                                time.sleep(2)
+    except ValueError:
+        print("\n[ERRO] Valor inválido!")
+        return
 
-                                print('''Escolha uma opção:
-                                1 - Tentar novamente
-                                2 - Cadastrar Usuário
-                                ''')
+    with conectar_banco() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                "SELECT id, username FROM usuarios WHERE username = %s",
+                (nome_user,)
+            )
 
-                                try:
-                                    escolha = int(input("Qual a sua escolha: "))
-                                except ValueError:
-                                    print("Valor invalido!")
-                                    return
+            resultado = cursor.fetchone()
 
-                                if escolha == 1:
-                                    login()
+            if resultado is not None:
 
-                                elif escolha == 2:
-                                    cad_user()
+                usuario_id = resultado[0]
 
-                                else:
-                                    print("Opção invalida!")
-                                    return
+                print("""
+========================================
+           USUÁRIO LOCALIZADO!
+========================================
+ Informe sua senha para continuar.
+========================================
+                """)
 
-                else:
-                    print("Usuário invalido!")
+                try:
+                    senha_user = input("Digite sua senha: ")
+
+                except ValueError:
+                    print("\n[ERRO] Valor inválido!")
                     return
 
+                with conectar_banco() as conexao:
+                    with conexao.cursor() as cursor:
+                        cursor.execute(
+                            """
+                            SELECT senha_hash
+                            FROM usuarios
+                            WHERE username = %s AND senha_hash = %s
+                            """,
+                            (nome_user, senha_user)
+                        )
 
-# tela de login do taskforge
-# user tenta login caso nao consiga ou nao ache a conta roda o cadastro py para cadastrar no banco de dados
-# dps de cadastrado roda novamente o login para efetuar o login com os cadastros do user referente
-# por fim roda o menu.py
+                        resultado_senha = cursor.fetchone()
+
+                        if resultado_senha is None:
+
+                            print("""
+========================================
+             SENHA INVÁLIDA!
+========================================
+ A senha informada está incorreta.
+========================================
+                            """)
+
+                            time.sleep(2)
+
+                            print("""
+========================================
+          O QUE DESEJA FAZER?
+========================================
+ [1] Tentar novamente
+ [2] Cadastrar usuário
+========================================
+                            """)
+
+                            try:
+                                escolha = int(input("Escolha uma opção: "))
+
+                            except ValueError:
+                                print("\n[ERRO] Opção inválida!")
+                                return
+
+                            if escolha == 1:
+                                return login()
+
+                            elif escolha == 2:
+                                return cad_user()
+
+                            else:
+                                print("\n[ERRO] Opção inválida!")
+                                return
+
+                        else:
+
+                            print(f"""
+========================================
+          LOGIN REALIZADO!
+========================================
+
+ Bem-vindo ao TaskForge!
+
+ Usuário: {nome_user}
+ ID:      {usuario_id}
+
+ [OK] Autenticação realizada!
+
+========================================
+                            """)
+
+                            time.sleep(1)
+                            menu_inicial(usuario_id)
+
+            else:
+
+                print("""
+========================================
+         USUÁRIO NÃO ENCONTRADO!
+========================================
+ Verifique o nome de usuário informado.
+========================================
+                """)
+                return
