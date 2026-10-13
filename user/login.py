@@ -106,7 +106,8 @@ def login():
                                 return login()
 
                             elif escolha == 2:
-                                return cad_user()
+                                cad_user()
+                                return login()
 
                             else:
                                 print("\n[ERRO] Opção inválida!")
@@ -130,15 +131,37 @@ def login():
                             """)
 
                             time.sleep(1)
-                            menu_inicial(usuario_id)
+                            return menu_inicial(usuario_id)
 
             else:
 
                 print("""
 ========================================
-         USUÁRIO NÃO ENCONTRADO!
+        USUÁRIO NÃO ENCONTRADO!
 ========================================
- Verifique o nome de usuário informado.
+
+ O usuário informado não está cadastrado.
+
+ [1] Tentar novamente
+ [2] Cadastrar novo usuário
+ [0] Sair
+
 ========================================
                 """)
-                return
+
+                escolha = input("Escolha uma opção: ").strip()
+
+                if escolha == "1":
+                    return login()
+
+                elif escolha == "2":
+                    cad_user()
+                    return login()
+
+                elif escolha == "0":
+                    print("\n[INFO] Encerrando TaskForge...")
+                    return
+
+                else:
+                    print("\n[ERRO] Opção inválida!")
+                    return login()
