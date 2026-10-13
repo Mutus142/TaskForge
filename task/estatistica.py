@@ -3,7 +3,7 @@ from database.connection import conectar_banco
 import time
 
 
-def estatisticas():
+def estatisticas(usuario_id):
 
     print("""
 ========================================
@@ -36,19 +36,19 @@ def estatisticas():
         return
 
     if opcao == 1:
-        task_cad()
+        task_cad(usuario_id)
 
     elif opcao == 2:
-        task_con()
+        task_con(usuario_id)
 
     elif opcao == 3:
-        task_pen()
+        task_pen(usuario_id)
 
     elif opcao == 4:
-        est_geral()
+        est_geral(usuario_id)
 
     elif opcao == 5:
-        task_atr()
+        task_atr(usuario_id)
 
     elif opcao == 6:
         print("\n[INFO] Voltando ao menu principal...")
@@ -64,12 +64,17 @@ def estatisticas():
         """)
 
 
-def task_cad():
+def task_cad(usuario_id):
 
     with conectar_banco() as conexao:
         with conexao.cursor() as cursor:
             cursor.execute(
-                "SELECT COUNT(*) FROM tarefas"
+                """
+                SELECT COUNT(*)
+                FROM tarefas
+                WHERE usuario_id = %s
+                """,
+                (usuario_id,)
             )
 
             resultado = cursor.fetchone()
@@ -105,12 +110,18 @@ def task_cad():
                 """)
 
 
-def task_con():
+def task_con(usuario_id):
 
     with conectar_banco() as conexao:
         with conexao.cursor() as cursor:
             cursor.execute(
-                "SELECT COUNT(id) FROM tarefas WHERE concluida = TRUE"
+                """
+                SELECT COUNT(id)
+                FROM tarefas
+                WHERE concluida = TRUE
+                AND usuario_id = %s
+                """,
+                (usuario_id,)
             )
 
             resultado = cursor.fetchone()
@@ -146,12 +157,18 @@ def task_con():
                 """)
 
 
-def task_pen():
+def task_pen(usuario_id):
 
     with conectar_banco() as conexao:
         with conexao.cursor() as cursor:
             cursor.execute(
-                "SELECT COUNT(id) FROM tarefas WHERE concluida = FALSE"
+                """
+                SELECT COUNT(id)
+                FROM tarefas
+                WHERE concluida = FALSE
+                AND usuario_id = %s
+                """,
+                (usuario_id,)
             )
 
             resultado = cursor.fetchone()
@@ -187,12 +204,17 @@ def task_pen():
                 """)
 
 
-def est_geral():
+def est_geral(usuario_id):
 
     with conectar_banco() as conexao:
         with conexao.cursor() as cursor:
             cursor.execute(
-                "SELECT COUNT(*) FROM tarefas"
+                """
+                SELECT COUNT(*)
+                FROM tarefas
+                WHERE usuario_id = %s
+                """,
+                (usuario_id,)
             )
 
             resultado1 = cursor.fetchone()
@@ -200,7 +222,13 @@ def est_geral():
     with conectar_banco() as conexao:
         with conexao.cursor() as cursor:
             cursor.execute(
-                "SELECT COUNT(id) FROM tarefas WHERE concluida = TRUE"
+                """
+                SELECT COUNT(id)
+                FROM tarefas
+                WHERE concluida = TRUE
+                AND usuario_id = %s
+                """,
+                (usuario_id,)
             )
 
             resultado2 = cursor.fetchone()
@@ -208,7 +236,13 @@ def est_geral():
     with conectar_banco() as conexao:
         with conexao.cursor() as cursor:
             cursor.execute(
-                "SELECT COUNT(id) FROM tarefas WHERE concluida = FALSE"
+                """
+                SELECT COUNT(id)
+                FROM tarefas
+                WHERE concluida = FALSE
+                AND usuario_id = %s
+                """,
+                (usuario_id,)
             )
 
             resultado3 = cursor.fetchone()
@@ -228,7 +262,7 @@ def est_geral():
     """)
 
 
-def task_atr():
+def task_atr(usuario_id):
 
     with conectar_banco() as conexao:
         with conexao.cursor() as cursor:
@@ -238,7 +272,9 @@ def task_atr():
                 FROM tarefas
                 WHERE vencimento < CURRENT_DATE
                 AND concluida = FALSE
-                """
+                AND usuario_id = %s
+                """,
+                (usuario_id,)
             )
 
             resultado = cursor.fetchone()
@@ -274,4 +310,3 @@ def task_atr():
 
 ========================================
                 """)
-

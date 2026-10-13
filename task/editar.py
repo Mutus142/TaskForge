@@ -3,7 +3,7 @@ from database.connection import conectar_banco
 import time
 
 
-def editar_task():
+def editar_task(usuario_id):
 
     task = input("\nDigite o título da tarefa que deseja editar: ").strip()
 
@@ -11,131 +11,152 @@ def editar_task():
         with conexao.cursor() as cursor:
 
             cursor.execute(
-                "SELECT titulo FROM tarefas WHERE titulo = %s",
-                (task,)
+                """
+                SELECT titulo FROM tarefas
+                WHERE titulo = %s AND usuario_id = %s
+                """,
+                (task, usuario_id)
             )
 
             resultado = cursor.fetchone()
 
-            if resultado is not None:
+    if resultado is not None:
 
-                print("""
+        print("""
+========================================
+          TASKFORGE v1.5
 ========================================
            EDITAR TAREFA
 ========================================
  [1] Editar título
  [2] Editar prioridade
 ========================================
-                """)
+        """)
 
-                try:
-                    escolha = int(input("Escolha uma opção: "))
+        try:
+            escolha = int(input("Escolha uma opção: "))
 
-                except ValueError:
-                    print("\n[ERRO] Digite uma opção numérica válida!")
-                    return
+        except ValueError:
+            print("\n[ERRO] Digite uma opção numérica válida!")
+            return
 
-                if escolha == 1:
-                    editar_titulo(task)
+        if escolha == 1:
+            editar_titulo(task, usuario_id)
 
-                elif escolha == 2:
-                    editar_prioridade(task)
+        elif escolha == 2:
+            editar_prioridade(task, usuario_id)
 
-                else:
-                    print("\n[ERRO] Opção inválida!")
+        else:
+            print("\n[ERRO] Opção inválida!")
 
-            else:
-                print("\n[ERRO] Tarefa não encontrada!")
+    else:
+        print("\n[ERRO] Tarefa não encontrada na sua conta!")
 
 
-def editar_titulo(task):
+def editar_titulo(task, usuario_id):
 
     with conectar_banco() as conexao:
         with conexao.cursor() as cursor:
 
             cursor.execute(
-                "SELECT * FROM tarefas WHERE titulo = %s",
-                (task,)
+                """
+                SELECT id FROM tarefas
+                WHERE titulo = %s AND usuario_id = %s
+                """,
+                (task, usuario_id)
             )
 
             resultado = cursor.fetchone()
 
-            if resultado is None:
-                print("\n[ERRO] Tarefa não encontrada!")
-                return
+    if resultado is None:
+        print("\n[ERRO] Tarefa não encontrada na sua conta!")
+        return
 
-            titulo_novo = input("\nDigite o novo título da tarefa: ").strip()
+    titulo_novo = input("\nDigite o novo título da tarefa: ").strip()
 
-            if not titulo_novo:
-                print("\n[ERRO] O título não pode estar vazio!")
-                return
+    if not titulo_novo:
+        print("\n[ERRO] O título não pode estar vazio!")
+        return
 
-            if titulo_novo == task:
-                print("\n[AVISO] O novo título é igual ao atual!")
-                return
+    if titulo_novo == task:
+        print("\n[AVISO] O novo título é igual ao atual!")
+        return
 
-            else:
-                with conectar_banco() as conexao:
-                    with conexao.cursor() as cursor:
+    else:
+        with conectar_banco() as conexao:
+            with conexao.cursor() as cursor:
 
-                        cursor.execute(
-                            "UPDATE tarefas SET titulo = %s WHERE titulo = %s",
-                            (titulo_novo, task)
-                        )
+                cursor.execute(
+                    """
+                    UPDATE tarefas
+                    SET titulo = %s
+                    WHERE titulo = %s AND usuario_id = %s
+                    """,
+                    (titulo_novo, task, usuario_id)
+                )
 
-                print(f"""
+        print(f"""
 ========================================
-        TAREFA ATUALIZADA!
+          TASKFORGE v1.5
+========================================
+          TAREFA ATUALIZADA!
 ========================================
  Título anterior: {task}
  Novo título:     {titulo_novo}
 ========================================
-                """)
+        """)
 
-                time.sleep(5)
+        time.sleep(5)
 
-                print("""
+        print("""
 ========================================
          O QUE DESEJA FAZER?
 ========================================
  [1] Editar outra tarefa
  [2] Voltar ao menu principal
 ========================================
-                """)
+        """)
 
-                try:
-                    escolha = int(input("Escolha uma opção: "))
+        try:
+            escolha = int(input("Escolha uma opção: "))
 
-                except ValueError:
-                    print("\n[ERRO] Digite uma opção numérica válida!")
-                    return
+        except ValueError:
+            print("\n[ERRO] Digite uma opção numérica válida!")
+            return
 
-                if escolha == 1:
-                    editar_task()
+        if escolha == 1:
+            return editar_task(usuario_id)
 
-                elif escolha == 2:
-                    print("\n[INFO] Voltando ao menu principal...")
-                    return
+        elif escolha == 2:
+            print("\n[INFO] Voltando ao menu principal...")
+            return
 
-                else:
-                    print("\n[ERRO] Opção inválida!")
+        else:
+            print("\n[ERRO] Opção inválida!")
 
-def editar_prioridade(task):
+
+def editar_prioridade(task, usuario_id):
 
     with conectar_banco() as conexao:
         with conexao.cursor() as cursor:
+
             cursor.execute(
-                "select * from tarefas where titulo = %s", (task,)
+                """
+                SELECT id FROM tarefas
+                WHERE titulo = %s AND usuario_id = %s
+                """,
+                (task, usuario_id)
             )
+
             resultado = cursor.fetchone()
 
-            if resultado is not None:
+    if resultado is not None:
 
-                prioridades = ["Alta", "Moderada", "Baixa"]
+        prioridades = ["Alta", "Moderada", "Baixa"]
 
-                print("""
+        print("""
 ========================================
-          TASKFORGE v1.1
+          TASKFORGE v1.5
 ========================================
          EDITAR PRIORIDADE
 ========================================
@@ -145,30 +166,37 @@ def editar_prioridade(task):
  [2] Moderada
  [3] Baixa
 ========================================
-                """)
+        """)
 
-                prioridade = input("Digite a nova prioridade: ").strip().capitalize()
+        prioridade = input("Digite a nova prioridade: ").strip().capitalize()
 
-                if prioridade in prioridades:
+        if prioridade in prioridades:
 
-                    with conectar_banco() as conexao:
-                        with conexao.cursor() as cursor:
-                            cursor.execute(
-                                "UPDATE tarefas SET prioridade = %s WHERE titulo = %s",
-                                (prioridade, task)
-                            )
+            with conectar_banco() as conexao:
+                with conexao.cursor() as cursor:
 
-                    print(f"""
+                    cursor.execute(
+                        """
+                        UPDATE tarefas
+                        SET prioridade = %s
+                        WHERE titulo = %s AND usuario_id = %s
+                        """,
+                        (prioridade, task, usuario_id)
+                    )
+
+            print(f"""
 ========================================
-      PRIORIDADE ATUALIZADA!
+          TASKFORGE v1.5
+========================================
+       PRIORIDADE ATUALIZADA!
 ========================================
  Tarefa:          {task}
  Nova prioridade: {prioridade}
 ========================================
-                    """)
+            """)
 
-                else:
-                    print("""
+        else:
+            print("""
 ========================================
          PRIORIDADE INVÁLIDA!
 ========================================
@@ -178,16 +206,14 @@ def editar_prioridade(task):
  - Moderada
  - Baixa
 ========================================
-                    """)
+            """)
 
-            else:
-                print("""
+    else:
+        print("""
 ========================================
         TAREFA NÃO ENCONTRADA!
 ========================================
- Não foi possível localizar a tarefa.
+ A tarefa informada não pertence
+ à sua conta ou não existe.
 ========================================
-                """)
-
-
-
+        """)
